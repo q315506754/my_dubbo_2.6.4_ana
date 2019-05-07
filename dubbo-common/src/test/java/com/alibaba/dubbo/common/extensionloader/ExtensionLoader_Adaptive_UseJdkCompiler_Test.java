@@ -17,9 +17,10 @@
 package com.alibaba.dubbo.common.extensionloader;
 
 import com.alibaba.dubbo.common.compiler.support.AdaptiveCompiler;
-
+import com.alibaba.dubbo.common.extension.ExtensionLoader;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class ExtensionLoader_Adaptive_UseJdkCompiler_Test extends ExtensionLoader_Adaptive_Test {
     @BeforeClass
@@ -31,4 +32,14 @@ public class ExtensionLoader_Adaptive_UseJdkCompiler_Test extends ExtensionLoade
     public static void tearDown() throws Exception {
         AdaptiveCompiler.setDefaultCompiler("javassist");
     }
+    @Test
+    public void test_() {
+        //这里使用自适应扩展 但是方法上没有Adaptive方法？
+        com.alibaba.dubbo.common.compiler.Compiler compiler = ExtensionLoader.getExtensionLoader(com.alibaba.dubbo.common.compiler.Compiler.class).getAdaptiveExtension();
+
+        Class<?> compile = compiler.compile("", getClass().getClassLoader());
+
+    }
+
+
 }

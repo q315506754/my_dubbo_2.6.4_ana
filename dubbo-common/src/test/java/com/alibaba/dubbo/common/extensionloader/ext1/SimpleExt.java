@@ -26,6 +26,7 @@ import com.alibaba.dubbo.common.extension.SPI;
 @SPI("impl1")
 public interface SimpleExt {
     // @Adaptive example, do not specify a explicit key.
+    //默认使用url参数——simple.ext
     @Adaptive
     String echo(URL url, String s);
 
