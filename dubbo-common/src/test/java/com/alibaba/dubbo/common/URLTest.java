@@ -17,24 +17,48 @@
 package com.alibaba.dubbo.common;
 
 import com.alibaba.dubbo.common.utils.CollectionUtils;
-
 import org.junit.Test;
 
 import java.io.File;
+import java.net.*;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 public class URLTest {
+
+    @Test
+    public void test_() {
+        String hostAddress = null;
+        try {
+            hostAddress = InetAddress.getLocalHost().getHostAddress();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        System.out.println(hostAddress);
+
+        try {
+            Socket socket = new Socket();
+            try {
+                SocketAddress addr = new InetSocketAddress("192.168.222.8", 2181);
+                socket.connect(addr, 1000);
+                String hostToBind = socket.getLocalAddress().getHostAddress();
+                System.out.println(hostToBind);
+            } finally {
+                try {
+                    socket.close();
+                } catch (Throwable e) {
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     @Test
     public void test_valueOf_noProtocolAndHost() throws Exception {

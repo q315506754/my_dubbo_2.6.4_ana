@@ -36,7 +36,9 @@ public class UrlUtils {
             url = address;
         } else {
             String[] addresses = Constants.COMMA_SPLIT_PATTERN.split(address);
-            url = addresses[0];
+            url = addresses[0];//取第一个
+
+            //address 为 xxxxx,yyyy的情况  yyyy加入参数backup=yyyy
             if (addresses.length > 1) {
                 StringBuilder backup = new StringBuilder();
                 for (int i = 1; i < addresses.length; i++) {
@@ -48,6 +50,8 @@ public class UrlUtils {
                 url += "?" + Constants.BACKUP_KEY + "=" + backup.toString();
             }
         }
+
+        //从map中提取出一些默认值
         String defaultProtocol = defaults == null ? null : defaults.get("protocol");
         if (defaultProtocol == null || defaultProtocol.length() == 0) {
             defaultProtocol = "dubbo";
@@ -56,8 +60,11 @@ public class UrlUtils {
         String defaultPassword = defaults == null ? null : defaults.get("password");
         int defaultPort = StringUtils.parseInteger(defaults == null ? null : defaults.get("port"));
         String defaultPath = defaults == null ? null : defaults.get("path");
+
+
         Map<String, String> defaultParameters = defaults == null ? null : new HashMap<String, String>(defaults);
         if (defaultParameters != null) {
+            //这些属性已经存到上面定义的变量中
             defaultParameters.remove("protocol");
             defaultParameters.remove("username");
             defaultParameters.remove("password");
@@ -65,14 +72,20 @@ public class UrlUtils {
             defaultParameters.remove("port");
             defaultParameters.remove("path");
         }
+
+        //new
         URL u = URL.valueOf(url);
+
         boolean changed = false;
+
         String protocol = u.getProtocol();
         String username = u.getUsername();
         String password = u.getPassword();
         String host = u.getHost();
         int port = u.getPort();
         String path = u.getPath();
+
+        //如果用户密码为空，尝试用config dto中的默认值
         Map<String, String> parameters = new HashMap<String, String>(u.getParameters());
         if ((protocol == null || protocol.length() == 0) && defaultProtocol != null && defaultProtocol.length() > 0) {
             changed = true;
@@ -105,6 +118,8 @@ public class UrlUtils {
                 path = defaultPath;
             }
         }
+
+
         if (defaultParameters != null && defaultParameters.size() > 0) {
             for (Map.Entry<String, String> entry : defaultParameters.entrySet()) {
                 String key = entry.getKey();
@@ -118,16 +133,20 @@ public class UrlUtils {
                 }
             }
         }
+
+        //重新构造url
         if (changed) {
             u = new URL(protocol, username, password, host, port, path, parameters);
         }
         return u;
     }
 
+    //address中可能还有一些用户名密码信息，若为空尝试使用defaults中的值
     public static List<URL> parseURLs(String address, Map<String, String> defaults) {
         if (address == null || address.length() == 0) {
             return null;
         }
+        //|;分隔
         String[] addresses = Constants.REGISTRY_SPLIT_PATTERN.split(address);
         if (addresses == null || addresses.length == 0) {
             return null; //here won't be empty

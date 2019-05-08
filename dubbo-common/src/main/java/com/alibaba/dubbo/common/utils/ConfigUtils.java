@@ -20,6 +20,7 @@ import com.alibaba.dubbo.common.Constants;
 import com.alibaba.dubbo.common.extension.ExtensionLoader;
 import com.alibaba.dubbo.common.logger.Logger;
 import com.alibaba.dubbo.common.logger.LoggerFactory;
+import com.alibaba.dubbo.common.read.ConfPath;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -139,6 +140,7 @@ public class ConfigUtils {
         return sb.toString();
     }
 
+    @ConfPath("注入config属性时加载的文件")
     public static Properties getProperties() {
         if (PROPERTIES == null) {
             synchronized (ConfigUtils.class) {
@@ -172,12 +174,16 @@ public class ConfigUtils {
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
+    //System.getProperty
+    //cp (dubbo.properties.file -> path ) -> props
+    //cp dubbo.properties -> props
     public static String getProperty(String key, String defaultValue) {
         String value = System.getProperty(key);
         if (value != null && value.length() > 0) {
             return value;
         }
         Properties properties = getProperties();
+        //替换掉返回值中的${xx}占位符
         return replaceProperty(properties.getProperty(key, defaultValue), (Map) properties);
     }
 

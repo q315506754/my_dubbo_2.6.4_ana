@@ -20,11 +20,7 @@ import com.alibaba.dubbo.common.Constants;
 import com.alibaba.dubbo.common.URL;
 import com.alibaba.dubbo.common.Version;
 import com.alibaba.dubbo.common.extension.ExtensionLoader;
-import com.alibaba.dubbo.common.utils.ConfigUtils;
-import com.alibaba.dubbo.common.utils.NetUtils;
-import com.alibaba.dubbo.common.utils.ReflectUtils;
-import com.alibaba.dubbo.common.utils.StringUtils;
-import com.alibaba.dubbo.common.utils.UrlUtils;
+import com.alibaba.dubbo.common.utils.*;
 import com.alibaba.dubbo.config.support.Parameter;
 import com.alibaba.dubbo.monitor.MonitorFactory;
 import com.alibaba.dubbo.monitor.MonitorService;
@@ -36,12 +32,12 @@ import com.alibaba.dubbo.rpc.ProxyFactory;
 import com.alibaba.dubbo.rpc.cluster.Cluster;
 import com.alibaba.dubbo.rpc.support.MockInvoker;
 
-import static com.alibaba.dubbo.common.utils.NetUtils.isInvalidLocalHost;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.alibaba.dubbo.common.utils.NetUtils.isInvalidLocalHost;
 
 /**
  * AbstractDefaultConfig
@@ -160,6 +156,8 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
 
     protected List<URL> loadRegistries(boolean provider) {
         checkRegistry();
+
+
         List<URL> registryList = new ArrayList<URL>();
         if (registries != null && !registries.isEmpty()) {
             for (RegistryConfig config : registries) {
@@ -167,10 +165,13 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
                 if (address == null || address.length() == 0) {
                     address = Constants.ANYHOST_VALUE;
                 }
+
+                //配置属性优先
                 String sysaddress = System.getProperty("dubbo.registry.address");
                 if (sysaddress != null && sysaddress.length() > 0) {
                     address = sysaddress;
                 }
+
                 if (address.length() > 0 && !RegistryConfig.NO_AVAILABLE.equalsIgnoreCase(address)) {
                     Map<String, String> map = new HashMap<String, String>();
                     appendParameters(map, application);
@@ -188,10 +189,15 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
                             map.put("protocol", "dubbo");
                         }
                     }
+
+                    //config dto -> map -> URL
                     List<URL> urls = UrlUtils.parseURLs(address, map);
                     for (URL url : urls) {
+                        //registry:dubbo
                         url = url.addParameter(Constants.REGISTRY_KEY, url.getProtocol());
+                        //protocol:registry
                         url = url.setProtocol(Constants.REGISTRY_PROTOCOL);
+
                         if ((provider && url.getParameter(Constants.REGISTER_KEY, true))
                                 || (!provider && url.getParameter(Constants.SUBSCRIBE_KEY, true))) {
                             registryList.add(url);
@@ -300,6 +306,7 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
                 throw new IllegalStateException("No such constructor \"public " + localClass.getSimpleName() + "(" + interfaceClass.getName() + ")\" in local implementation class " + localClass.getName());
             }
         }
+
         if (ConfigUtils.isNotEmpty(stub)) {
             Class<?> localClass = ConfigUtils.isDefault(stub) ? ReflectUtils.forName(interfaceClass.getName() + "Stub") : ReflectUtils.forName(stub);
             if (!interfaceClass.isAssignableFrom(localClass)) {
@@ -311,7 +318,9 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
                 throw new IllegalStateException("No such constructor \"public " + localClass.getSimpleName() + "(" + interfaceClass.getName() + ")\" in local implementation class " + localClass.getName());
             }
         }
+
         if (ConfigUtils.isNotEmpty(mock)) {
+            //
             if (mock.startsWith(Constants.RETURN_PREFIX)) {
                 String value = mock.substring(Constants.RETURN_PREFIX.length());
                 try {

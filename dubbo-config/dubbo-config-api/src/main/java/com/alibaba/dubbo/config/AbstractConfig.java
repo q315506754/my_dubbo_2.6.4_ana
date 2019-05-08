@@ -89,34 +89,49 @@ public abstract class AbstractConfig implements Serializable {
         return value;
     }
 
+    //往下优先级降低
+    //1 注入System getProperty属性
+    //2 get方法为空时通过配置文件(dubbo.properties.file指定的文件路径，或是cp中的dubbo.properties)的属性注入
+    //通过config的setter注入属性
     protected static void appendProperties(AbstractConfig config) {
         if (config == null) {
             return;
         }
+        //比如 dubbo.monitor.
         String prefix = "dubbo." + getTagName(config.getClass()) + ".";
+
         Method[] methods = config.getClass().getMethods();
         for (Method method : methods) {
             try {
                 String name = method.getName();
+
+                //找到set方法
                 if (name.length() > 3 && name.startsWith("set") && Modifier.isPublic(method.getModifiers())
                         && method.getParameterTypes().length == 1 && isPrimitive(method.getParameterTypes()[0])) {
+                    //属性名 setAaaBbbCcc -> aaa.bbb.ccc
                     String property = StringUtils.camelToSplitName(name.substring(3, 4).toLowerCase() + name.substring(4), ".");
 
                     String value = null;
                     if (config.getId() != null && config.getId().length() > 0) {
+
+                        //比如 dubbo.monitor.$configId.$property
                         String pn = prefix + config.getId() + "." + property;
                         value = System.getProperty(pn);
                         if (!StringUtils.isBlank(value)) {
                             logger.info("Use System Property " + pn + " to config dubbo");
                         }
                     }
+
                     if (value == null || value.length() == 0) {
+                        //比如 dubbo.monitor.$property
                         String pn = prefix + property;
                         value = System.getProperty(pn);
                         if (!StringUtils.isBlank(value)) {
                             logger.info("Use System Property " + pn + " to config dubbo");
                         }
                     }
+
+                    //尝试从property对应的get
                     if (value == null || value.length() == 0) {
                         Method getter;
                         try {
@@ -128,12 +143,15 @@ public abstract class AbstractConfig implements Serializable {
                                 getter = null;
                             }
                         }
+
                         if (getter != null) {
                             if (getter.invoke(config) == null) {
                                 if (config.getId() != null && config.getId().length() > 0) {
+                                    //从配置文件中读取
                                     value = ConfigUtils.getProperty(prefix + config.getId() + "." + property);
                                 }
                                 if (value == null || value.length() == 0) {
+                                    //从配置文件中读取
                                     value = ConfigUtils.getProperty(prefix + property);
                                 }
                                 if (value == null || value.length() == 0) {
@@ -146,6 +164,9 @@ public abstract class AbstractConfig implements Serializable {
                             }
                         }
                     }
+
+
+                    //属性注入到bean中
                     if (value != null && value.length() > 0) {
                         method.invoke(config, convertPrimitive(method.getParameterTypes()[0], value));
                     }
@@ -156,6 +177,7 @@ public abstract class AbstractConfig implements Serializable {
         }
     }
 
+    //取类名（"Config", "Bean"）前面部分的小写
     private static String getTagName(Class<?> cls) {
         String tag = cls.getSimpleName();
         for (String suffix : SUFFIXES) {
