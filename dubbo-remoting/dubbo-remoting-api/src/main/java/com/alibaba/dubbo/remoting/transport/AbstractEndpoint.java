@@ -29,6 +29,8 @@ import com.alibaba.dubbo.remoting.transport.codec.CodecAdapter;
 
 /**
  * AbstractEndpoint
+ *
+ *
  */
 public abstract class AbstractEndpoint extends AbstractPeer implements Resetable {
 

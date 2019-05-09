@@ -53,6 +53,9 @@ public class Transporters {
         } else {
             handler = new ChannelHandlerDispatcher(handlers);
         }
+
+        //传输层绑定地址获得一个普通Server
+        //
         return getTransporter().bind(url, handler);
     }
 

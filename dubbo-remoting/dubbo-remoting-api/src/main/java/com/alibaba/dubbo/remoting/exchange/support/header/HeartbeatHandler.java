@@ -31,6 +31,7 @@ public class HeartbeatHandler extends AbstractChannelHandlerDelegate {
 
     private static final Logger logger = LoggerFactory.getLogger(HeartbeatHandler.class);
 
+    //被HeaderExchangeHandler引用
     public static String KEY_READ_TIMESTAMP = "READ_TIMESTAMP";
 
     public static String KEY_WRITE_TIMESTAMP = "WRITE_TIMESTAMP";

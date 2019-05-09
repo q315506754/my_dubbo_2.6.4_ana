@@ -25,6 +25,8 @@ import com.alibaba.dubbo.remoting.RemotingException;
 
 /**
  * AbstractPeer
+ *
+ * 实现的方法做了一些基础校验
  */
 public abstract class AbstractPeer implements Endpoint, ChannelHandler {
 

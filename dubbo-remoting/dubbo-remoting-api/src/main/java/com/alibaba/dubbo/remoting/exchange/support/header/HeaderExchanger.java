@@ -28,7 +28,8 @@ import com.alibaba.dubbo.remoting.transport.DecodeHandler;
 /**
  * DefaultMessenger
  *
- *
+ * 根据通道属性对通道进行一定的逻辑处理和校验
+ * 维护某些通道属性
  */
 public class HeaderExchanger implements Exchanger {
 
@@ -41,6 +42,12 @@ public class HeaderExchanger implements Exchanger {
 
     @Override
     public ExchangeServer bind(URL url, ExchangeHandler handler) throws RemotingException {
+        //传输层服务器（地址，解码器（））
+        //交换机服务器（传输层服务器）
+
+        //这里为什么要用HeaderExchangeHandler包装handler？
+        //为了在handler上设置最后读写时间戳，写入到了channel上
+        //这个时间戳在HeaderExchangeServer中的定期检测心跳发送双工消息时会用到
         return new HeaderExchangeServer(Transporters.bind(url, new DecodeHandler(new HeaderExchangeHandler(handler))));
     }
 

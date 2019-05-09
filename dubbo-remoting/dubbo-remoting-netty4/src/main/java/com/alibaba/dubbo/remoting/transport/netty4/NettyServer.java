@@ -62,7 +62,11 @@ public class NettyServer extends AbstractServer implements Server {
     private EventLoopGroup workerGroup;
 
     public NettyServer(URL url, ChannelHandler handler) throws RemotingException {
+        //注意这里的wrap
+        //相当于又多了一层Dispatcher层
         super(url, ChannelHandlers.wrap(handler, ExecutorUtil.setThreadName(url, SERVER_THREAD_POOL_NAME)));
+
+    //    父类调用了doOpen监听端口
     }
 
     @Override
@@ -73,6 +77,7 @@ public class NettyServer extends AbstractServer implements Server {
         workerGroup = new NioEventLoopGroup(getUrl().getPositiveParameter(Constants.IO_THREADS_KEY, Constants.DEFAULT_IO_THREADS),
                 new DefaultThreadFactory("NettyServerWorker", true));
 
+        //实际的netty处理类
         final NettyServerHandler nettyServerHandler = new NettyServerHandler(getUrl(), this);
         channels = nettyServerHandler.getChannels();
 
@@ -91,11 +96,14 @@ public class NettyServer extends AbstractServer implements Server {
                                 .addLast("handler", nettyServerHandler);
                     }
                 });
-        // bind
-        ChannelFuture channelFuture = bootstrap.bind(getBindAddress());
-        channelFuture.syncUninterruptibly();
-        channel = channelFuture.channel();
 
+        // bind 地址在父构造中已经从URL里获得
+        ChannelFuture channelFuture = bootstrap.bind(getBindAddress());
+
+        channelFuture.syncUninterruptibly();
+
+        //netty的频道 用来检活
+        channel = channelFuture.channel();
     }
 
     @Override
