@@ -229,7 +229,7 @@ public class DubboProtocol extends AbstractProtocol {
         URL url = invoker.getUrl();
 
         // export service.
-        String key = serviceKey(url);
+        String key = serviceKey(url);//com.alibaba.dubbo.demo.DemoService:20880
         DubboExporter<T> exporter = new DubboExporter<T>(invoker, key, exporterMap);
         exporterMap.put(key, exporter);
 
@@ -248,7 +248,7 @@ public class DubboProtocol extends AbstractProtocol {
             }
         }
 
-        openServer(url);
+        openServer(url);//dubbo://192.168.60.49:20880/com.alibaba.dubbo.demo.DemoService?anyhost=true&application=demo-provider&bind.ip=192.168.60.49&bind.port=20880&dubbo=2.0.2&generic=false&interface=com.alibaba.dubbo.demo.DemoService&methods=sayHello&pid=27968&qos.port=22222&side=provider&timestamp=1559096871662
         optimizeSerialization(url);
         return exporter;
     }
@@ -261,7 +261,7 @@ public class DubboProtocol extends AbstractProtocol {
         if (isServer) {
             ExchangeServer server = serverMap.get(key);
             if (server == null) {
-                serverMap.put(key, createServer(url));
+                serverMap.put(key, createServer(url));//192.168.60.49:20880
             } else {
                 // server supports reset, use together with override
                 server.reset(url);

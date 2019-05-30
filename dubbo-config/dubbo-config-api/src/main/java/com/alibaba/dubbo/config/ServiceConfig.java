@@ -534,7 +534,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
 
             // export to local if the config is not remote (export to remote only when config is remote)
             if (!Constants.SCOPE_REMOTE.toString().equalsIgnoreCase(scope)) {
-                exportLocal(url);
+                exportLocal(url);//dubbo://192.168.60.49:20880/com.alibaba.dubbo.demo.DemoService?anyhost=true&application=demo-provider&bind.ip=192.168.60.49&bind.port=20880&dubbo=2.0.2&generic=false&interface=com.alibaba.dubbo.demo.DemoService&methods=sayHello&pid=27968&qos.port=22222&side=provider&timestamp=1559096871662
             }
 
             //远程暴露
@@ -587,10 +587,10 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
     @SuppressWarnings({"unchecked", "rawtypes"})
     private void exportLocal(URL url) {
         if (!Constants.LOCAL_PROTOCOL.equalsIgnoreCase(url.getProtocol())) {
-            URL local = URL.valueOf(url.toFullString())
+            URL local = URL.valueOf(url.toFullString())//dubbo://192.168.60.49:20880/com.alibaba.dubbo.demo.DemoService?anyhost=true&application=demo-provider&bind.ip=192.168.60.49&bind.port=20880&dubbo=2.0.2&generic=false&interface=com.alibaba.dubbo.demo.DemoService&methods=sayHello&pid=27968&qos.port=22222&side=provider&timestamp=1559096871662
                     .setProtocol(Constants.LOCAL_PROTOCOL)
                     .setHost(LOCALHOST)
-                    .setPort(0);
+                    .setPort(0);//injvm://127.0.0.1/com.alibaba.dubbo.demo.DemoService?anyhost=true&application=demo-provider&bind.ip=192.168.60.49&bind.port=20880&dubbo=2.0.2&generic=false&interface=com.alibaba.dubbo.demo.DemoService&methods=sayHello&pid=27968&qos.port=22222&side=provider&timestamp=1559096871662
 
             ServiceClassHolder.getInstance().pushServiceClass(getServiceClass(ref));
             Exporter<?> exporter = protocol.export(
@@ -634,7 +634,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
                 anyhost = true;
                 try {
                     //本地ip转成局域网ip
-                    hostToBind = InetAddress.getLocalHost().getHostAddress();
+                    hostToBind = InetAddress.getLocalHost().getHostAddress();//192.168.60.49
                 } catch (UnknownHostException e) {
                     logger.warn(e.getMessage(), e);
                 }

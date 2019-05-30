@@ -190,11 +190,11 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
                         }
                     }
 
-                    //config dto -> map -> URL
+                    //config dto -> map -> URL  zookeeper://zk1.i.g2s.cn:2181/com.alibaba.dubbo.registry.RegistryService?application=demo-provider&backup=zk2.i.g2s.cn:2181,zk3.i.g2s.cn:2181&dubbo=2.0.2&pid=27968&qos.port=22222&timestamp=1559096269308
                     List<URL> urls = UrlUtils.parseURLs(address, map);
                     for (URL url : urls) {
                         //registry:dubbo
-                        url = url.addParameter(Constants.REGISTRY_KEY, url.getProtocol());
+                        url = url.addParameter(Constants.REGISTRY_KEY, url.getProtocol());//zookeeper://zk1.i.g2s.cn:2181/com.alibaba.dubbo.registry.RegistryService?application=demo-provider&backup=zk2.i.g2s.cn:2181,zk3.i.g2s.cn:2181&dubbo=2.0.2&pid=27968&qos.port=22222&registry=zookeeper&timestamp=1559096269308
                         //protocol:registry
                         url = url.setProtocol(Constants.REGISTRY_PROTOCOL);
 
@@ -206,7 +206,7 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
                 }
             }
         }
-        return registryList;
+        return registryList;//registry://zk1.i.g2s.cn:2181/com.alibaba.dubbo.registry.RegistryService?application=demo-provider&backup=zk2.i.g2s.cn:2181,zk3.i.g2s.cn:2181&dubbo=2.0.2&pid=27968&qos.port=22222&registry=zookeeper&timestamp=1559096269308
     }
 
     protected URL loadMonitor(URL registryURL) {

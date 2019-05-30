@@ -42,7 +42,7 @@ public class HeaderExchanger implements Exchanger {
 
     @Override
     public ExchangeServer bind(URL url, ExchangeHandler handler) throws RemotingException {
-        //传输层服务器（地址，解码器（））
+        //传输层服务器（地址，解码器（Decodeable Request Response））
         //交换机服务器（传输层服务器）
 
         //这里为什么要用HeaderExchangeHandler包装handler？
